@@ -11,7 +11,7 @@
 
 <br />
 
-<img src="https://via.placeholder.com/800x400.png?text=Add+Your+Screenshot+Here" alt="Project Screenshot" width="800"/>
+<img src="Rag_UI.png" alt="Project Screenshot" width="800"/>
 
 <br />
 
