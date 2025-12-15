@@ -11,7 +11,10 @@
 
 <br />
 
-<img src="Rag_UI.png" alt="Project Screenshot" width="800"/>
+<img src="Rag_UI.png" alt="Project Screenshot" width="650"/>
+<img src="UI.png" alt="Project Screenshot" width="650"/>
+
+UI.png
 
 <br />
 
