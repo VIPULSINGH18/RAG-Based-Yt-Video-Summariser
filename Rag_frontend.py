@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-from langchain_community.document_loaders import YoutubeLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
@@ -9,6 +8,10 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
+
+# --- NEW IMPORTS FOR COOKIE FIX ---
+from youtube_transcript_api import YouTubeTranscriptApi
+from langchain_core.documents import Document
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
@@ -121,18 +124,40 @@ with st.sidebar:
 def get_embeddings():
     return HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-def create_vector_db(video_url):
+# --- ✅ REPLACED FUNCTION: Custom Loader using Cookies ---
+def load_video_manually(video_url):
     try:
-        loader = YoutubeLoader.from_youtube_url(
-            video_url,
-            add_video_info=False,
-            language=["en", "hi", "hinglish"],
-        )
-        docs = loader.load()
+        # 1. Extract Video ID from URL
+        if "v=" in video_url:
+            video_id = video_url.split("v=")[1].split("&")[0]
+        elif "youtu.be" in video_url:
+            video_id = video_url.split("/")[-1]
+        else:
+            return None, "Invalid YouTube URL format."
         
-        if not docs:
-            return None, "No transcript found."
+        # 2. Fetch Transcript using Cookies (Bypasses IP Block)
+        # Make sure 'cookies.txt' is in your repo root!
+        try:
+            transcript = YouTubeTranscriptApi.get_transcript(video_id, cookies="cookies.txt")
+        except Exception as e:
+            return None, f"Transcript Error: {str(e)} (Ensure cookies.txt is valid)"
 
+        # 3. Combine text into a Document
+        full_text = " ".join([i['text'] for i in transcript])
+        docs = [Document(page_content=full_text, metadata={"source": video_url})]
+        
+        return docs, None
+    except Exception as e:
+        return None, str(e)
+
+def create_vector_db(video_url):
+    # ✅ Using the new manual loader instead of YoutubeLoader
+    docs, error_msg = load_video_manually(video_url)
+    
+    if not docs:
+        return None, error_msg
+
+    try:
         splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=400)
         chunks = splitter.split_documents(docs)
 
