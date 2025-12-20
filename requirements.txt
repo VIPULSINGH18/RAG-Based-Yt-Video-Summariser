@@ -1,9 +1,10 @@
 streamlit
 langchain-groq
 langchain-huggingface
-youtube-transcript-api
+youtube-transcript-api==0.6.2
 faiss-cpu
 tiktoken
 langchain-community
 pytubefix
+
 python-dotenv
