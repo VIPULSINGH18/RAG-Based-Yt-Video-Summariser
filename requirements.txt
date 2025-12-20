@@ -1,0 +1,9 @@
+streamlit
+langchain-groq
+langchain-huggingface
+youtube-transcript-api
+faiss-cpu
+tiktoken
+langchain-community
+pytubefix
+python-dotenv
